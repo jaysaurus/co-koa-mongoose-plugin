@@ -1,7 +1,6 @@
 language: node_js
 node_js:
   - "8"
-repo_token: gD5uQ5amm4QiMMeTYZeN8p1NDkYGUlN5o
 branches:
     only:
       - master
