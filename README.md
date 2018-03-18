@@ -4,8 +4,11 @@
 
 # co-koa-mongoose-plugin
 
-
+[![Build Status](https://travis-ci.org/jaysaurus/co-koa-mongoose-plugin.svg?branch=master)](https://travis-ci.org/jaysaurus/co-koa-mongoose-plugin.svg?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/jaysaurus/co-koa-mongoose-plugin/badge.svg?branch=master)](https://coveralls.io/repos/github/jaysaurus/co-koa-mongoose-plugin/badge.svg?branch=master)
+<!-- [![Greenkeeper badge](https://badges.greenkeeper.io/jaysaurus/co-koa-core.svg)](https://greenkeeper.io/) -->
 [![Test For Vulnerabilities](https://snyk.io/test/github/jaysaurus/co-koa-mongoose-plugin/badge.svg?targetFile=package.json)](https://snyk.io/test/github/jaysaurus/co-koa-mongoose-plugin?targetFile=package.json)
+
 
 As of Co.Koa@1.5.0 the mongoose API has been fully decoupled into a plugin. For details on how to use this plugin once it has been installed please visit the [Models](http://cokoajs.com/miniSite/documentation/Model.html) page of the Co.Koa [documentation](http://cokoajs.com/)
 
