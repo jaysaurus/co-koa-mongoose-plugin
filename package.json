@@ -1,0 +1,22 @@
+{
+  "name": "co-koa-mongoose-plugin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --runInBand --coverage && cat ./coverage/lcov.info | coveralls",
+    "test-watch": "nodemon --exec 'npm test'"
+  },
+  "author": "Jay Edwards <the.jaysaurus@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "echo-handler": "^1.8.2",
+    "mongoose": "^5.0.10",
+    "mongoose-type-number-enums": "^1.0.4",
+    "stampit": "^4.1.1"
+  },
+  "devDependencies": {
+    "jest": "^22.4.2",
+    "lodash.clonedeep": "^4.5.0"
+  }
+}
