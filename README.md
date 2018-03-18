@@ -4,6 +4,8 @@
 
 # co-koa-mongoose-plugin
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jaysaurus/co-koa-mongoose-plugin.svg)](https://greenkeeper.io/)
+
 As of Co.Koa@1.5.0 the mongoose API has been fully decoupled into a plugin. For details on how to use this plugin once it has been installed please visit the [Models](http://cokoajs.com/miniSite/documentation/Model.html) page of the Co.Koa [documentation](http://cokoajs.com/)
 
 ## installation
