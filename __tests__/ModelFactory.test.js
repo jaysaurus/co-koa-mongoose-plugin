@@ -133,4 +133,20 @@ const buildModelActualCallback = builderCalls[3] // expose the second component 
     } })
     expect(() => { modelFactory3.init(app, $); }).toThrow('invalidConnectionString')
   });
+
+  test('mongoose plugins are called', () => {
+    const spy = []
+    const modelFactory4 = ModelFactory({
+      plugins: [(mongoose) => {
+        return {
+          init: (app, $) => {
+            spy.push(app);
+            spy.push($)
+          }
+        }
+      }]
+    }).init(app, $);
+    expect(spy[0]).toBe(app)
+    expect(spy[1]).toBe($)
+  });
 });

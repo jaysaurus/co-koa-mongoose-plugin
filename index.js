@@ -9,7 +9,8 @@ const ModelFactoryHelper = require('./lib/ModelFactoryHelper');
 module.exports = stampit({
   init ({
     connectionString = 'mongodb://localhost:27017/coKoa',
-    promise = global.Promise
+    promise = global.Promise,
+    plugins
   }) {
     const buildModelCallback = ($, helper, echo) => {
       return (modelCallback, modelName) => {
@@ -55,6 +56,7 @@ module.exports = stampit({
       _builder.build('Model', buildModelCallback($, helper, echo));
       app._modelRegister.mongoose =
         itemName => mongoose.models ? mongoose.models[itemName] : undefined;
+      if (plugins) plugins.forEach(plugin => { plugin(mongoose).init(app, $); });
     };
   }
 });

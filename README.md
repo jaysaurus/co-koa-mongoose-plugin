@@ -38,11 +38,12 @@ The `mongoosePlugin` can optionally be called with a configuration object.  The 
 ```javascript
 SessionPlugin({
   connectionString = 'mongodb://localhost:27017/coKoa',
-  promise = global.Promise
+  promise = global.Promise,
+  plugins = undefined
 })
 ```
 
-The connectionString property expects either a list of strings or an object containing environment properties matching those supplied to your Co.Koa environment at launch (see [installation & execution documentation](https://github.com/jaysaurus/Co.Koa/wiki/Installation-&-Execution#user-content-execution) for more information):
+The **connectionString** property expects either a list of strings or an object containing environment properties matching those supplied to your Co.Koa environment at launch (see [installation & execution documentation](https://github.com/jaysaurus/Co.Koa/wiki/Installation-&-Execution#user-content-execution) for more information):
 ```javascript
 connectionString: {
   development: 'mongodb://etc',
@@ -52,4 +53,16 @@ connectionString: {
 ...
 ```
 
-the promise property expects a promise library for mongoose to use on asynchronous requests. You are strongly encouraged to supply an alternative promise library to mongoose.  At the time of writing, the global promise library is significantly slower than other promise libraries (see, for example [bluebird](https://github.com/petkaantonov/bluebird))
+the **promise** property expects a promise library for mongoose to use on asynchronous requests. You are strongly encouraged to supply an alternative promise library to mongoose.  At the time of writing, the global promise library is significantly slower than other promise libraries (see, for example [bluebird](https://github.com/petkaantonov/bluebird))
+
+the **plugins** property can be supplied an array of additional Co.Koa plugins.  These should point to methods based on the boilerplate below:
+```javascript
+(mongoose) => {
+  ...
+  return {
+    init (app, $) => {
+      ...
+    }
+  }
+}
+```
