@@ -70,10 +70,22 @@ const buildModelActualCallback = builderCalls[3] // expose the second component 
       expect(spy[2]).toBe('bindClientModelToSchema was called');
       expect(spy[3]).toBe('mongoose.model() was called for the model: "mock"');
   });
-  test('buildModelCallback throws if missing a schema', () => {
+  test('buildModelCallback throws meaningful error if internal component presents an issue', () => {
     const modelCallbackCalled = false
     expect(() => {
-      buildModelActualCallback((value) => { return { _modelType: 'mongoose' } }, 'mock');
+      buildModelActualCallback((value) => {
+        return {
+          _modelType: 'mongoose',
+          schema: {
+            error: true
+          }
+        } }, 'mock');
+    }).toThrow('modelError');
+  });
+  test('buildModelCallback throws if missing a schema', () => {
+    expect(() => {
+      buildModelActualCallback(
+        (value) => { return { _modelType: 'mongoose' } }, 'mock');
     }).toThrow('noSchema');
   });
   test('buildModelCallback is not a mongoose model', () => {

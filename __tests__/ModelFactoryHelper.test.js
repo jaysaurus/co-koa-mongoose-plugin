@@ -86,9 +86,11 @@ describe('ModelFactoryHelper tests', () => {
   });
   test('INTEGRATION TEST: injectSchemaObjectIds parses ObjectId, ForeignKey and FK', () => {
     const fakeSchema = {
+      test0: String,
       test1: {
         type: 'ObjectId',
         ignore: 'ignored',
+        other: 1,
         test2: {
           type: 'ForeignKey',
           test3: {
@@ -96,7 +98,7 @@ describe('ModelFactoryHelper tests', () => {
           }
         }
       },
-      type: 'FK'
+      type: 'FK',
     }
     const helper =
       ModelFactoryHelper()
@@ -104,6 +106,7 @@ describe('ModelFactoryHelper tests', () => {
           require('../__mocks__/TreeAlgorithm'), // using the real deal
           fakeSchema);
 
+    expect(fakeSchema.test0).toBe(String);
     expect(fakeSchema.type).toBe('OUTPUT');
     expect(fakeSchema.test1.type).toBe('OUTPUT');
     expect(fakeSchema.test1.ignore).toBe('ignored');

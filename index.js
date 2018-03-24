@@ -16,14 +16,18 @@ module.exports = stampit({
         const model = modelCallback($);
         if (model.hasOwnProperty('_modelType') && model._modelType === 'mongoose') {
           if (model.hasOwnProperty('schema')) {
-            helper.injectSchemaObjectIds($(':tree'), model.schema);
-            const schema = new mongoose.Schema(model.schema, model.options);
-            if (model.index) schema.index(model.index);
-            const statics = helper.bindClientModelToSchema(model, schema);
-            const Model = mongoose.model(modelName, schema);
-            statics.forEach(func => { // bind Model class as 'this' to statics
-              Model[func] = Model[func].bind(Model);
-            });
+            try {
+              helper.injectSchemaObjectIds($(':tree'), model.schema);
+              const schema = new mongoose.Schema(model.schema, model.options);
+              if (model.index) schema.index(model.index);
+              const statics = helper.bindClientModelToSchema(model, schema);
+              const Model = mongoose.model(modelName, schema);
+              statics.forEach(func => { // bind Model class as 'this' to statics
+                Model[func] = Model[func].bind(Model);
+              });
+            } catch (e) {
+              echo.throw('modelError', modelName, e.message);
+            }
           } else echo.throw('noSchema', modelName);
         }
       };
@@ -55,6 +59,7 @@ module.exports = stampit({
       _builder.build('Model', buildModelCallback($, helper, echo));
       app._modelRegister.mongoose =
         itemName => mongoose.models ? mongoose.models[itemName] : undefined;
+      app._mongoose = mongoose;
     };
   }
 });

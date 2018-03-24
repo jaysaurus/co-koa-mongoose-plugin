@@ -7,5 +7,6 @@
   "invalidType": "dependency expects strings, but got: {0}.",
   "invalidTypeName": "custom mongoose Type filenames must begin with a capital letter and be suffixed with the word \"Type\". Co.koa found: \"{0}\"",
   "missingAssetConfig": "Warning! Your project is missing a default AssetConfig.js; Co.Koa will attempt to use its default AssetConfig...",
+  "modelError": "Something went wrong while building \"{0}\": {1}",
   "unsupported": "unsupported dependency format: {0}."
 }
