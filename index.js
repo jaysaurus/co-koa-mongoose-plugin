@@ -60,11 +60,7 @@ module.exports = stampit({
       _builder.build('Model', buildModelCallback($, helper, echo));
       app._modelRegister.mongoose =
         itemName => mongoose.models ? mongoose.models[itemName] : undefined;
-<<<<<<< HEAD
-      app._mongoose = mongoose;
-=======
       if (plugins) plugins.forEach(plugin => { plugin(mongoose).init(app, $); });
->>>>>>> 71e9ff2d49628c367842b3b2a213d3e9902e6a72
     };
   }
 });
