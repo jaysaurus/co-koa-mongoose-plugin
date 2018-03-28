@@ -8,8 +8,8 @@ describe('ModelFactoryHelper tests', () => {
     const errorSpy = [];
     const throwSpy = [];
     const log = {
-      error: e => { errorSpy.push(e) },
-      throw: e => { throwSpy.push(e) }
+      error: (e, ...args) => { errorSpy.push({ e, args }) },
+      throw: (e, ...args) => { throwSpy.push({ e, args }) }
     }
     const model = {
       index: {
@@ -29,7 +29,8 @@ describe('ModelFactoryHelper tests', () => {
       },
       statics: {
         mockStatic: 1
-      }
+      },
+      hooks: 'ignore'
     }
     const schema = {
       index: {},
@@ -44,7 +45,8 @@ describe('ModelFactoryHelper tests', () => {
             observer.push(a);
           }
         }
-      }
+      },
+      hooks: 'ignore'
     }
 
     const helper = ModelFactoryHelper();
@@ -66,6 +68,98 @@ describe('ModelFactoryHelper tests', () => {
     expect(observer.length).toBe(3);
     expect(typeof observer[2]).toBe('function');
   });
+  test('bindClientModelToSchema binds client\'s hooks to a mongoose schema and handles duff validators/hooks', ()=> {
+    const errorSpy = [];
+    const throwSpy = [];
+    const log = {
+      error: (e, ...args) => { errorSpy.push({ e, args }) },
+      throw: (e, ...args) => { throwSpy.push({ e, args }) }
+    }
+    const model = {
+      virtuals: {
+        badVirtualObject: 'test',
+        mockVirtual: {
+          badVirtualMethod () {},
+          set: 123 // proof invalid props are ignored
+        }
+      },
+      hooks: {
+        pre: {
+          save () {
+            return 'saveFunction'
+          },
+          find: 'badHookPreType',
+          badHookPreMethod () {},
+
+        },
+        post: 'badHookType',
+        badHookMethod () {}
+      }
+    }
+    const hooks = []
+    const schema = {
+      index: {},
+      methods: {},
+      statics: {},
+      virtual (arg) {
+        return {
+          get (a) {
+            observer.push(a);
+          },
+          set (a) {
+            observer.push(a);
+          }
+        }
+      },
+      pre (name, func) {
+        hooks.push({ name, func });
+      }
+    }
+
+    const helper = ModelFactoryHelper();
+    const statics = helper.bindClientModelToSchema(log, 'test', model, schema);
+
+    // virtual tests
+    expect(hooks.length).toBe(1);
+    expect(hooks[0].func()).toBe('saveFunction');
+    expect(hooks[0].name).toBe('save');
+
+    // virtual doesn't conform to object type
+    expect(errorSpy[0].e).toBe('invalidComp');
+    expect(errorSpy[0].args[1]).toBe('virtuals.badVirtualObject');
+
+    // virtual method doesn't conform to method types
+    expect(errorSpy[1].e).toBe('notAFunc');
+    expect(errorSpy[1].args[1]).toBe('virtuals.mockVirtual');
+    expect(errorSpy[1].args[2]).toBe('badVirtualMethod');
+
+    // virtual method isn't a function
+    expect(errorSpy[2].e).toBe('notAFunc');
+    expect(errorSpy[2].args[1]).toBe('virtuals.mockVirtual');
+    expect(errorSpy[2].args[2]).toBe('set');
+
+    // hook pre is supplied something other than a function
+    expect(errorSpy[3].e).toBe('notAFunc');
+    expect(errorSpy[3].args[1]).toBe('pre');
+    expect(errorSpy[3].args[2]).toBe('find');
+
+    // hook pre is supplied an unexpected method type
+    expect(errorSpy[4].e).toBe('notSupported');
+    expect(errorSpy[4].args[1]).toBe('pre');
+    expect(errorSpy[4].args[2]).toBe('badHookPreMethod');
+
+    // hook post is supplied but not a function
+    expect(errorSpy[5].e).toBe('notAnObj');
+    expect(errorSpy[5].args[1]).toBe('post');
+
+    // hook is supplied an unexpected method type
+    expect(errorSpy[6].e).toBe('invalidComp');
+    expect(errorSpy[6].args[1]).toBe('badHookMethod');
+    expect(errorSpy[6].args[2]).toBe('Hook');
+  });
+  test('edge case', () => {
+
+  })
 
   test('buildTypeCallback assigns new type to mongoose', () => {
     const callback = ModelFactoryHelper().buildTypeCallback();
