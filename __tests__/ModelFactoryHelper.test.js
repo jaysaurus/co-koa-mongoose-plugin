@@ -5,6 +5,12 @@ jest.mock('mongoose');
 describe('ModelFactoryHelper tests', () => {
   test('bindClientModelToSchema binds client\'s model to a mongoose schema', ()=> {
     const observer = [];
+    const errorSpy = [];
+    const throwSpy = [];
+    const log = {
+      error: e => { errorSpy.push(e) },
+      throw: e => { throwSpy.push(e) }
+    }
     const model = {
       index: {
         foo: 'foo',
@@ -16,9 +22,9 @@ describe('ModelFactoryHelper tests', () => {
       },
       virtuals: {
         mockVirtual: {
-          get: 1,
-          ignore: 123, // proof invalid props are ignored
-          set: 2
+          get () {},
+          set (a) {},
+          ignore: 123 // proof invalid props are ignored
         }
       },
       statics: {
@@ -42,11 +48,11 @@ describe('ModelFactoryHelper tests', () => {
     }
 
     const helper = ModelFactoryHelper();
-    const statics = helper.bindClientModelToSchema(model, schema);
+    const statics = helper.bindClientModelToSchema(log, 'test', model, schema);
     // virtual tests
     expect(observer.length).toBe(2);
-    expect(observer[0]).toBe(1);
-    expect(observer[1]).toBe(2);
+    expect(typeof observer[0]).toBe('function');
+    expect(typeof observer[1]).toBe('function');
 
     // model tests
     expect(statics.length).toBe(1);
@@ -56,9 +62,9 @@ describe('ModelFactoryHelper tests', () => {
 
     // get/set missing, exit gracefully
     delete model.virtuals.mockVirtual.set
-    helper.bindClientModelToSchema(model, schema);
+    helper.bindClientModelToSchema(log, 'test', model, schema);
     expect(observer.length).toBe(3);
-    expect(observer[2]).toBe(1);
+    expect(typeof observer[2]).toBe('function');
   });
 
   test('buildTypeCallback assigns new type to mongoose', () => {
