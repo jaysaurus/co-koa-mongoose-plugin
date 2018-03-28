@@ -21,7 +21,7 @@ module.exports = stampit({
               helper.injectSchemaObjectIds($(':tree'), model.schema);
               const schema = new mongoose.Schema(model.schema, model.options);
               if (model.index) schema.index(model.index);
-              const statics = helper.bindClientModelToSchema(model, schema);
+              const statics = helper.bindClientModelToSchema(echo, modelName, model, schema);
               const Model = mongoose.model(modelName, schema);
               statics.forEach(func => { // bind Model class as 'this' to statics
                 Model[func] = Model[func].bind(Model);
