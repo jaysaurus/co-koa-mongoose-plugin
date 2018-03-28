@@ -157,9 +157,6 @@ describe('ModelFactoryHelper tests', () => {
     expect(errorSpy[6].args[1]).toBe('badHookMethod');
     expect(errorSpy[6].args[2]).toBe('Hook');
   });
-  test('edge case', () => {
-
-  })
 
   test('buildTypeCallback assigns new type to mongoose', () => {
     const callback = ModelFactoryHelper().buildTypeCallback();
