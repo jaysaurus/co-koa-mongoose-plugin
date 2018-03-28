@@ -20,7 +20,7 @@ add co-koa-mongoose-plugin to a Co.Koa project instance via:
 npm i co-koa-mongoose-plugin --save
 ```
 
-within your app.js add the co-koa-mongoose-plugin as a requirement and pass the SessionPlugin call as below:
+within your app.js add the co-koa-mongoose-plugin as a requirement and pass the mongoosePlugin call as below:
 
 ```javascript
 const fs = require('fs');
