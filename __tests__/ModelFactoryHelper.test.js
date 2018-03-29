@@ -181,6 +181,35 @@ describe('ModelFactoryHelper tests', () => {
     expect(spy[0]).toBe('invalidTypeName');
     expect(spy[1]).toBe('mockName');
   });
+
+// getConnectionString ($, echo, connectionString) {
+//   if (typeof connectionString === 'string') return connectionString;
+//   else {
+//     const connection = connectionString[$.environment];
+//     return connection || echo.throw('invalidConnectionString', $.environment);
+//   }
+// },
+
+  test('getConnectionString tests', () => {
+    const helper = ModelFactoryHelper();
+    expect(helper.getConnectionString(0,0, 'connectionString')).toBe('connectionString');
+    expect( // environment driven test
+      helper
+        .getConnectionString(
+          { environment: 'test' }, 0,
+          { test: 'connectionString2' }))
+        .toBe('connectionString2');
+
+    let observer = '';
+    helper
+      .getConnectionString(
+        { environment: 'test' },
+        { 'throw' (result) { observer = result; } },
+        { junk: 'connectionString2' })
+    expect(observer)
+        .toBe('invalidConnectionString');
+  });
+
   test('INTEGRATION TEST: injectSchemaObjectIds parses ObjectId, ForeignKey and FK', () => {
     const fakeSchema = {
       test0: String,
