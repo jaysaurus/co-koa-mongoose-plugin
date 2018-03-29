@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1522361016190" clover="3.2.0">
-  <project timestamp="1522361016190" name="All files">
-    <metrics statements="109" coveredstatements="109" conditionals="55" coveredconditionals="54" methods="26" coveredmethods="26" elements="190" coveredelements="189" complexity="0" loc="109" ncloc="109" packages="2" files="2" classes="2">
+<coverage generated="1522361867541" clover="3.2.0">
+  <project timestamp="1522361867542" name="All files">
+    <metrics statements="109" coveredstatements="109" conditionals="55" coveredconditionals="54" methods="27" coveredmethods="26" elements="191" coveredelements="189" complexity="0" loc="109" ncloc="109" packages="2" files="2" classes="2">
       <package name="co-koa-mongoose-plugin">
-        <metrics statements="46" coveredstatements="46" conditionals="16" coveredconditionals="16" methods="10" coveredmethods="10"/>
+        <metrics statements="46" coveredstatements="46" conditionals="16" coveredconditionals="16" methods="11" coveredmethods="10"/>
         <file name="index.js" path="/home/jay/codeBase/npm/co-koa-mongoose-plugin/index.js">
-          <metrics statements="46" coveredstatements="46" conditionals="16" coveredconditionals="16" methods="10" coveredmethods="10"/>
+          <metrics statements="46" coveredstatements="46" conditionals="16" coveredconditionals="16" methods="11" coveredmethods="10"/>
           <line num="1" count="1" type="stmt"/>
           <line num="2" count="1" type="stmt"/>
           <line num="3" count="1" type="stmt"/>

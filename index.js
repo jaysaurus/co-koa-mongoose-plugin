@@ -72,7 +72,7 @@ module.exports = stampit({
       build(app, $, echo);
       registerModels(app, mongoose);
       registerPlugins(app, $, mongoose);
-      $.mongoose = mongoose;
+      $.getMongooseTypes = () => mongoose.Types;
     };
   }
 });
