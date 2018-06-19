@@ -14,5 +14,6 @@
   "invalidTypeName": "custom mongoose Type filenames must begin with a capital letter and be suffixed with the word \"Type\". Co.koa found: \"{0}\"",
   "missingAssetConfig": "Warning! Your project is missing a default AssetConfig.js; Co.Koa will attempt to use its default AssetConfig...",
   "modelError": "Something went wrong while building \"{0}\": {1}",
+  "nestedSchemaNotFound": "attempted to assign nested schema \"{0}\" to a model but the nested schema could not be found.\nIs a nested schema referencing another nested schema with a lower number somewhere?",
   "unsupported": "unsupported dependency format: {0}."
 }

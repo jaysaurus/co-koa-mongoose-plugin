@@ -12,6 +12,8 @@ module.exports = stampit({
     promise = global.Promise,
     plugins
   }) {
+    const _nestedSchemas = {};
+
     const helper = ModelFactoryHelper();
 
     const build = (app, $, echo) => {
@@ -19,23 +21,34 @@ module.exports = stampit({
       if (fs.existsSync(`${$.root}/api/models/types`)) {
         _builder.build('models/type', helper.buildTypeCallback(echo));
       }
-      _builder.build('Model', buildModelCallback($, echo));
+      [ m => m._modelType === 'mongoose' && m.hasOwnProperty('_nest'),
+        m => m._modelType === 'mongoose' ].forEach((callback, i) => {
+        _builder.build(
+          'Model',
+          buildModelCallback($, echo, callback), i === 1);
+      });
     };
 
-    const buildModelCallback = ($, echo) => {
+    const buildModelCallback = ($, echo, condition) => {
       return (modelCallback, modelName) => {
         const model = modelCallback($);
-        if (model.hasOwnProperty('_modelType') && model._modelType === 'mongoose') {
+        if (model.hasOwnProperty('_modelType') && condition(model)) {
           if (model.hasOwnProperty('schema')) {
             try {
-              helper.injectSchemaObjectIds($(':tree'), model.schema);
+              helper.injectSchemaObjectIds(
+                $(':tree'), model.schema, _nestedSchemas, echo);
               const schema = new mongoose.Schema(model.schema, model.options);
               if (model.index) schema.index(model.index);
-              const statics = helper.bindClientModelToSchema(echo, modelName, model, schema);
-              const Model = mongoose.model(modelName, schema);
-              statics.forEach(func => { // bind Model class as 'this' to statics
-                Model[func] = Model[func].bind(Model);
-              });
+              helper.bindClientModelToSchema(echo, modelName, model, schema);
+              if (!_nestedSchemas.hasOwnProperty(modelName)) {
+                const Model = mongoose.model(modelName, schema);
+                Object.keys(schema.statics).forEach(func => { // bind Model class as 'this' to statics
+                  Model[func] = Model[func].bind(Model);
+                });
+              }
+              if (model.hasOwnProperty('_nest')) {
+                _nestedSchemas[modelName] = schema;
+              }
             } catch (e) {
               echo.throw('modelError', modelName, e.message);
             }
