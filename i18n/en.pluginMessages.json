@@ -10,6 +10,7 @@
   "invalidDependencyFile": "Invalid {0} detected: {1} must be a function that receives a single argument and returns an object literal.",
   "invalidComp": "Mongoose: {0}.{1} is not a valid {2}. supported methods: {3}.",
   "invalidAsset": "Invalid asset detected: \"{0}\".  The token may be misspelled or it may be missing from your local AssetConfig.js",
+  "invalidNestType": "Invalid _nest found on: \"{0}\".  This may cause Co.Koa problems because ._nest expects a number",
   "invalidType": "dependency expects strings, but got: {0}.",
   "invalidTypeName": "custom mongoose Type filenames must begin with a capital letter and be suffixed with the word \"Type\". Co.koa found: \"{0}\"",
   "missingAssetConfig": "Warning! Your project is missing a default AssetConfig.js; Co.Koa will attempt to use its default AssetConfig...",
