@@ -12,6 +12,8 @@
 
 As of Co.Koa@1.5.0 the mongoose API has been fully decoupled into a plugin. For details on how to use this plugin once it has been installed please visit the [Models](http://cokoajs.com/miniSite/documentation/Model.html) page of the Co.Koa [documentation](http://cokoajs.com/)
 
+**co-koa-mongoose@^1.8.0** has only been tested with `co-koa-core`@^1.16.0 and may contain breaking changes with older versions.
+
 ## installation
 
 add co-koa-mongoose-plugin to a Co.Koa project instance via:
