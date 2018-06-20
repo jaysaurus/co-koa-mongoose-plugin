@@ -50,17 +50,16 @@ describe('ModelFactoryHelper tests', () => {
     }
 
     const helper = ModelFactoryHelper();
-    const statics = helper.bindClientModelToSchema(log, 'test', model, schema);
+    helper.bindClientModelToSchema(log, 'test', model, schema);
     // virtual tests
     expect(observer.length).toBe(2);
     expect(typeof observer[0]).toBe('function');
     expect(typeof observer[1]).toBe('function');
 
     // model tests
-    expect(statics.length).toBe(1);
-    expect(statics[0]).toBe('mockStatic');
     expect(schema.methods).toEqual(model.methods);
     expect(schema.index).toEqual(model.index);
+    expect(schema.statics).toEqual(model.statics);
 
     // get/set missing, exit gracefully
     delete model.virtuals.mockVirtual.set
@@ -158,6 +157,93 @@ describe('ModelFactoryHelper tests', () => {
     expect(errorSpy[6].args[2]).toBe('Hook');
   });
 
+  test('buildModel successful behaviour', () => {
+    const _activeSchemas = {};
+    const helper = ModelFactoryHelper({_activeSchemas});
+    const spy = []
+    helper.injectSchemaObjectIds = function () {
+      spy.push('injectSchemaObjectIds called')
+    }
+    helper.bindClientModelToSchema = function () {
+      spy.push('bindClientModelToSchema called')
+    }
+    const $ = () => {};
+    const echoSpy = {};
+    const indexSpy = [];
+    const schemaSpy = [];
+    const echo = { throw: function (a, b) { return {[a]: b} } }
+    schemas = {
+      mock: {
+        key: {
+          m: {
+            schema: (it) => schemaSpy.push(it),
+            index: (it) => indexSpy.push(it)
+          },
+          modelName: 'MockModel'
+        }
+      }
+    }
+    helper.buildModel({$, echo, key: 'key', schemas, type: 'mock'});
+    expect(indexSpy).toEqual(['mongoose schema index called']);
+    expect(schemaSpy).toEqual(['Mongoose schema initialised']);
+    expect(_activeSchemas).toHaveProperty('MockModel');
+    expect(_activeSchemas.MockModel).toHaveProperty('index');
+    expect(_activeSchemas.MockModel).toHaveProperty('statics');
+    expect(_activeSchemas.MockModel.statics).toHaveProperty('foo');
+    expect(_activeSchemas.MockModel.statics).toHaveProperty('bar');
+  });
+  test('buildModel gracefully ignores index if undefined', () => {
+    const _activeSchemas = {};
+    const helper = ModelFactoryHelper({_activeSchemas});
+    const spy = []
+    helper.injectSchemaObjectIds = function () {
+      spy.push('injectSchemaObjectIds called')
+    }
+    helper.bindClientModelToSchema = function () {
+      spy.push('bindClientModelToSchema called')
+    }
+    const $ = () => {};
+    const echoSpy = {};
+    const indexSpy = [];
+    const schemaSpy = [];
+    const echo = { throw: function (a, b) { return {[a]: b} } }
+    schemas = {
+      mock: {
+        key: {
+          m: {
+            schema: (it) => schemaSpy.push(it),
+          },
+          modelName: 'MockModel'
+        }
+      }
+    }
+    helper.buildModel({$, echo, key: 'key', schemas, type: 'mock'});
+    expect(indexSpy).toEqual([]);
+    expect(schemaSpy).toEqual(['Mongoose schema initialised']);
+    expect(_activeSchemas).toHaveProperty('MockModel');
+    expect(_activeSchemas.MockModel).toHaveProperty('index');
+    expect(_activeSchemas.MockModel).toHaveProperty('statics');
+    expect(_activeSchemas.MockModel.statics).toHaveProperty('foo');
+    expect(_activeSchemas.MockModel.statics).toHaveProperty('bar');
+  });
+  test('buildModel fails because noSchema', () => {
+    schemas = {
+      mock: {
+        key: {
+          m: {
+            // uh oh no schema
+          },
+          modelName: 'MockModel'
+        }
+      }
+    }
+    let echoSpy = {}
+    const echo = { throw: function (a, b) { echoSpy = {[a]: b} } }
+    const helper = ModelFactoryHelper();
+    helper.buildModel({ $: undefined, echo, key: 'key', schemas, type: 'mock' })
+    expect(echoSpy['noSchema']).toBe('MockModel');
+  })
+
   test('buildTypeCallback assigns new type to mongoose', () => {
     const callback = ModelFactoryHelper().buildTypeCallback();
     const mockgoose = callback({}, 'MockName');
@@ -181,14 +267,6 @@ describe('ModelFactoryHelper tests', () => {
     expect(spy[0]).toBe('invalidTypeName');
     expect(spy[1]).toBe('mockName');
   });
-
-// getConnectionString ($, echo, connectionString) {
-//   if (typeof connectionString === 'string') return connectionString;
-//   else {
-//     const connection = connectionString[$.environment];
-//     return connection || echo.throw('invalidConnectionString', $.environment);
-//   }
-// },
 
   test('getConnectionString tests', () => {
     const helper = ModelFactoryHelper();
@@ -222,15 +300,28 @@ describe('ModelFactoryHelper tests', () => {
           test3: {
             type: 'FK'
           }
-        }
+        },
       },
-      type: 'FK',
+      test4: 'nested:Mock',
+      test5: 'nested:InvalidSchema',
+      other () { },
+      type: 'FK'
+    }
+    const _activeSchemas = {
+      'Mock': 'I am a nested schema'
+    }
+    const echoSpy = {};
+    const echo = {
+      throw: function (type, name) {
+        echoSpy[type] = name
+      }
     }
     const helper =
-      ModelFactoryHelper()
+      ModelFactoryHelper({_activeSchemas})
         .injectSchemaObjectIds(
           require('../__mocks__/TreeAlgorithm'), // using the real deal
-          fakeSchema);
+          fakeSchema,
+          echo);
 
     expect(fakeSchema.test0).toBe(String);
     expect(fakeSchema.type).toBe('OUTPUT');
@@ -238,5 +329,103 @@ describe('ModelFactoryHelper tests', () => {
     expect(fakeSchema.test1.ignore).toBe('ignored');
     expect(fakeSchema.test1.test2.type).toBe('OUTPUT');
     expect(fakeSchema.test1.test2.test3.type).toBe('OUTPUT');
+    expect(fakeSchema.test4).toBe('I am a nested schema')
+    expect(echoSpy['nestedSchemaNotFound']).toBe('InvalidSchema');
+  });
+
+  test('loadSchemas successful basic object', () => {
+    const loadSchemasCallback = {}
+    const _builder = { build: (name, callback) => {
+        modelCallback = function () {
+          return {
+            _modelType: 'mongoose',
+          }
+        }
+        callback(modelCallback, 'Mock')
+      }
+    }
+    const helper = ModelFactoryHelper();
+    const result = helper.loadSchemas({}, _builder);
+
+    expect(result.basic.length).toBe(1);
+    expect(result.basic[0].m).toEqual({ _modelType: 'mongoose' });
+    expect(result.basic[0].modelName).toEqual('Mock');
+
+  });
+  test('loadSchemas successful nested object', () => {
+    const loadSchemasCallback = {}
+    const _builder = { build: (name, callback) => {
+        modelCallback = function () {
+          return {
+            _modelType: 'mongoose',
+            _nest: 0
+          }
+        }
+        callback(modelCallback, 'Mock')
+      }
+    }
+    const helper = ModelFactoryHelper();
+    const result = helper.loadSchemas({}, _builder);
+
+    expect(result.nested[0]).toEqual({
+      m: {
+        _modelType: 'mongoose',
+        _nest: 0
+      },
+      modelName: 'Mock'
+    });
+  });
+  test('loadSchemas gracefully disregard non mongoose models', () => {
+    const loadSchemasCallback = {}
+    const _builder = { build: (name, callback) => {
+        modelCallback = function () {
+          return {
+            _modelType: 'not-mongoose',
+          }
+        }
+        callback(modelCallback, 'Mock')
+      }
+    }
+    const helper = ModelFactoryHelper();
+    const result = helper.loadSchemas({}, _builder);
+
+    expect(result.nested).toEqual({});
+    expect(result.basic).toEqual([]);
+
+  });
+  test('loadSchemas gracefully disregard objects with no _modelType', () => {
+    const loadSchemasCallback = {}
+    const _builder = { build: (name, callback) => {
+        modelCallback = function () {
+          return {
+          }
+        }
+        callback(modelCallback, 'Mock')
+      }
+    }
+    const helper = ModelFactoryHelper();
+    const result = helper.loadSchemas({}, _builder);
+
+    expect(result.nested).toEqual({});
+    expect(result.basic).toEqual([]);
+
+  });
+  test('loadSchemas erroneous nested object', () => {
+    const loadSchemasCallback = {}
+    const _builder = { build: (name, callback) => {
+        modelCallback = function () {
+          return {
+            _modelType: 'mongoose',
+            _nest: false
+          }
+        }
+        callback(modelCallback, 'Mock')
+      }
+    }
+    const helper = ModelFactoryHelper();
+    echoSpy = {};
+    const result = helper.loadSchemas({}, _builder, { error (a, b) {echoSpy[a] = b}});
+
+    expect(echoSpy['invalidNestType']).toEqual('Mock');
   });
 });

@@ -1,4 +1,4 @@
-module.exports = {
+const m = {
   connect (string) {
     const obj = {};
     obj.catch = function (next) {
@@ -17,20 +17,14 @@ module.exports = {
     };
   },
   model (modelName, schema) {
-    schema.spy.push(`mongoose.model() was called for the model: "${modelName}"`);
     return {
-      foo: function () { },
-      bar: function () { },
+      foo: { bind () {} },
+      bar: { bind () {} },
       spy: []
     };
   },
   models: {
     mock: 'I am a mock model'
-  },
-  Schema: {
-    Types: {
-      ObjectId: 'OUTPUT'
-    }
   },
   SchemaType: {
     call (obj, a, b, c) {
@@ -42,3 +36,18 @@ module.exports = {
     prototype: {}
   }
 };
+m.Schema = function (schema, options) {
+  schema('Mongoose schema initialised');
+  this.index = function (i) {
+    i('mongoose schema index called');
+  };
+  this.statics =
+    {
+      foo: function () { },
+      bar: function () { }
+    };
+};
+m.Schema.Types = {
+  ObjectId: 'OUTPUT'
+};
+module.exports = m;
