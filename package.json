@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest --runInBand --coverage && cat ./coverage/lcov.info | coveralls",
     "test-debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
-    "test-watch": "nodemon --exec 'npm test'"
+    "test-watch": "nodemon --exec 'npm test'",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "author": "Jay Edwards <the.jaysaurus@gmail.com>",
   "license": "ISC",
@@ -14,11 +16,13 @@
     "echo-handler": "^1.8.2",
     "mongoose": "^5.0.10",
     "mongoose-type-number-enums": "^1.0.4",
-    "stampit": "^4.1.1"
+    "stampit": "^4.1.1",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "coveralls": "^3.0.0",
     "jest": "^22.4.2",
     "lodash.clonedeep": "^4.5.0"
-  }
+  },
+  "snyk": true
 }
